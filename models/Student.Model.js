@@ -1,25 +1,22 @@
 const mongoose = require("mongoose");
 
-const bookSchema = new mongoose.Schema({
-  bookTitle: {
+const studentSchema = new mongoose.Schema({
+  fullName: {
     type: String,
-    required: true,
+    default: null
   },
-  author: {
-    type: String,
-    required: true,
-  },
-  subject: {
-    type: String,
-    required: true,
-  },
-  year: {
-    type: String,
-    required: true,
-  },
-  quantity: {
+  studentNumber: {
     type: Number,
-    required: true,
+    default: null
+  },
+  section: {
+    type: String,
+    default: null,
+
+  },
+  teacherEvaluated: {
+    type: String,
+    default: null
   },
   createdAt: {
     type: String,
@@ -41,5 +38,5 @@ function getDateValue() {
   return (finaldate = `${month} ${day}, ${year}`);
 }
 
-const Book = mongoose.model("Book", bookSchema);
-module.exports = Book;
+const Customer = mongoose.model("Student", studentSchema);
+module.exports = Customer;

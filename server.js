@@ -4,20 +4,29 @@ const morgan = require("morgan");
 const cors = require("cors");
 require("dotenv").config();
 require("./config/database_connections");
-const libraryRoutes = require("./routes/libraryRoutes");
+require("./utils/email/emailQueue");
 
+const authRoutes = require("./routes/Auth/AuthRoute");
+const userRoutes = require("./routes/User/UserRoutes");
+const cookieParser = require("cookie-parser");
+
+app.use(cookieParser());
 app.use(express.json());
-
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://library-client-seven.vercel.app"],
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
 app.use(morgan("dev"));
 
-app.use("/", libraryRoutes);
+// ✅ Routes
+app.use("/api/v1/", authRoutes);
+app.use("/api/v1/", userRoutes);
 
-app.listen(process.env.PORT, () => { console.log("Server is running at port " + process.env.PORT); });
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;

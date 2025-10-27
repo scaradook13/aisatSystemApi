@@ -1,27 +1,7 @@
 const mongoose = require("mongoose");
 
-const borrowerSchema = new mongoose.Schema({
-  borrowerName: {
-    type: String,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: String,
-    required: true,
-  },
-  dueDate: {
-    type: String,
-    required: true,
-  },
-  bookBorrowed: {
-    type: String,
-    required: true,
-  },
-  contact: {
+const adminSchema = new mongoose.Schema({
+  fullName: {
     type: String,
     required: true,
   },
@@ -45,5 +25,5 @@ function getDateValue() {
   return (finaldate = `${month} ${day}, ${year}`);
 }
 
-const Borrower = mongoose.model("Borrower", borrowerSchema);
-module.exports = Borrower;
+const Admin = mongoose.model("Admin", adminSchema);
+module.exports = Admin;
