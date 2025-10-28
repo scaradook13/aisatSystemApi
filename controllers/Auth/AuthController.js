@@ -1,3 +1,4 @@
+const User = require('../../models/User.Model');
 const AuthService = require('../../services/Auth/AuthService');
 const asyncTryCatch = require('../../utils/asyncTryAndCatch');
 
@@ -13,20 +14,32 @@ class AuthController {
   });
 
   getCurrentUser = asyncTryCatch(async (req, res) => {
-    if (req.isAuthenticated()) {
-      res.json(req.user);
-    } else {
-      res.status(401).json({ message: 'Not authenticated' });
-    }
-  });
+  if (!req.user || !req.user.userId) {
+    return res.status(401).json({ message: "User not authenticated" });
+  }
+
+  const userFound = await User.findById(req.user.userId)
+    .populate("profile")
+    .lean();
+
+  if (!userFound) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  delete userFound.password;
+  return res.status(200).json(userFound);
+});
+
+
 
   logout = asyncTryCatch(async (req, res) => {
-    req.logout((err) => {
-      if (err) return next(err);
-      res.clearCookie('connect.sid'); // Clear the session cookie
-      res.json({ message: 'Logout successful' });
-    });
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
   });
+  return res.status(200).json({ message: "Logout successful" });
+});
 
 }
 

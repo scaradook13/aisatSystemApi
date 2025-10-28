@@ -24,23 +24,34 @@ class AuthMiddleware {
   }
 
   // ✅ Verify Session (for both Passport sessions or manual JWT)
-  async verifySession(req, res, next) {
-    try {
-      const token = req.cookies.jwt;
+ async verifySession(req, res, next) {
+  try {
+    const token = req.cookies?.jwt;
 
-      if (req.isAuthenticated && req.isAuthenticated()) return next();
-
-      if (token) {
-        const decoded = jwtUtils.verifyToken(token);
-        req.user = decoded;
-        return next();
-      }
-
-      return res.status(401).json({ message: "Not authenticated" });
-    } catch (err) {
-      return res.status(403).json({ message: "Invalid session or token" });
+    // 🔹 1. No token at all
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated — no session token found" });
     }
+
+    // 🔹 2. Optional: for Passport sessions
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      return next();
+    }
+
+    // 🔹 3. Verify token if present
+    const decoded = jwtUtils.verifyToken(token);
+    req.user = decoded;
+
+    // ✅ Proceed if token is valid
+    return next();
+
+  } catch (err) {
+    // 🔹 4. Handle invalid or expired token
+    console.error("Session verification error:", err.message);
+    return res.status(403).json({ message: "Invalid or expired session token" });
   }
+}
+
 
   // ✅ Generate OTP and send email
   async sendAndSaveOtp(req, res) {

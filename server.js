@@ -8,6 +8,8 @@ require("./utils/email/emailQueue");
 
 const authRoutes = require("./routes/Auth/AuthRoute");
 const userRoutes = require("./routes/User/UserRoutes");
+const adminRoutes = require("./routes/Admin/AdminRoutes");
+const managementRoutes = require("./routes/Admin/ManagementRoutes");
 const cookieParser = require("cookie-parser");
 
 app.use(cookieParser());
@@ -23,6 +25,8 @@ app.use(morgan("dev"));
 // ✅ Routes
 app.use("/api/v1/", authRoutes);
 app.use("/api/v1/", userRoutes);
+app.use("/api/v1/", managementRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

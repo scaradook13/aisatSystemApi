@@ -11,7 +11,7 @@ router.post("/login", ValidationChecker.validateLogin, AuthController.login);
 
 
 // Get current user- test route
-router.get('/auth/user', AuthMiddleware.verifySession, AccountController.getCurrentUser);
+router.get('/auth/user', AuthMiddleware.verifySession, AuthController.getCurrentUser);
 
 // Logout
 router.get('/auth/logout', AuthController.logout);
