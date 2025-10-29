@@ -96,6 +96,74 @@ class ManagementController {
       content: deletedStudent,
     });
   });
+
+  addForm = asyncTryCatch(async (req, res) => {
+    const newForm = await ManagementService.addForm(req.body);
+    res.status(newForm.success ? 201 : 400).json({ content: newForm });
+  });
+
+  getForms = asyncTryCatch(async (req, res) => {
+    const forms = await ManagementService.getActiveForm();
+    res.status(forms.success ? 200 : 404).json({ content: forms });
+  });
+
+  updateForm = asyncTryCatch(async (req, res) => {
+    const { id } = req.params;
+    const updatedForm = await ManagementService.updateForm(id, req.body);
+    res.status(updatedForm.success ? 200 : 400).json({ content: updatedForm });
+  });
+
+  deleteForm = asyncTryCatch(async (req, res) => {
+    const { id } = req.params;
+    const deletedForm = await ManagementService.deleteForm(id);
+    res.status(deletedForm.success ? 200 : 404).json({ content: deletedForm });
+  });
+
+  // ===================== CATEGORY =====================
+  addCategory = asyncTryCatch(async (req, res) => {
+    const newCategory = await ManagementService.addCategory(req.body);
+    res.status(newCategory.success ? 201 : 400).json({ content: newCategory });
+  });
+
+  getCategories = asyncTryCatch(async (req, res) => {
+    const categories = await ManagementService.getCategories();
+    res.status(categories.success ? 200 : 404).json({ content: categories });
+  });
+
+  updateCategory = asyncTryCatch(async (req, res) => {
+    const { id } = req.params;
+    const updatedCategory = await ManagementService.updateCategory(id, req.body);
+    res.status(updatedCategory.success ? 200 : 400).json({ content: updatedCategory });
+  });
+
+  deleteCategory = asyncTryCatch(async (req, res) => {
+    const { id } = req.params;
+    const deletedCategory = await ManagementService.deleteCategory(id);
+    res.status(deletedCategory.success ? 200 : 404).json({ content: deletedCategory });
+  });
+
+  // ===================== QUESTION =====================
+  addQuestion = asyncTryCatch(async (req, res) => {
+    const newQuestion = await ManagementService.addQuestion(req.body);
+    res.status(newQuestion.success ? 201 : 400).json({ content: newQuestion });
+  });
+
+  getQuestions = asyncTryCatch(async (req, res) => {
+    const questions = await ManagementService.getQuestions();
+    res.status(questions.success ? 200 : 404).json({ content: questions });
+  });
+
+  updateQuestion = asyncTryCatch(async (req, res) => {
+    const { id } = req.params;
+    const updatedQuestion = await ManagementService.updateQuestion(id, req.body);
+    res.status(updatedQuestion.success ? 200 : 400).json({ content: updatedQuestion });
+  });
+
+  deleteQuestion = asyncTryCatch(async (req, res) => {
+    const { id } = req.params;
+    const deletedQuestion = await ManagementService.deleteQuestion(id);
+    res.status(deletedQuestion.success ? 200 : 404).json({ content: deletedQuestion });
+  });
 }
 
 module.exports = new ManagementController();

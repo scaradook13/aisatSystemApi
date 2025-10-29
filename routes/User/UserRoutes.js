@@ -12,5 +12,5 @@ router.post(
   authMiddleware.verifySession,
   AccountController.completeProfile
 );
-
+router.post("/addEvaluation", authMiddleware.verifySession, AccountController.addEvaluation);
 module.exports = router;

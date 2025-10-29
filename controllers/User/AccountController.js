@@ -29,6 +29,13 @@ class UserController {
       content: newProfile,
     });
   });
+
+  // ===================== EVALUATION =====================
+addEvaluation = asyncTryCatch(async (req, res) => {
+  const newEvaluation = await UserService.addEvaluation(req.body);
+  res.status(newEvaluation.success ? 201 : 400).json({ content: newEvaluation });
+});
+
 }
 
 module.exports = new UserController();

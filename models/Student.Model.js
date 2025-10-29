@@ -12,11 +12,15 @@ const studentSchema = new mongoose.Schema({
   section: {
     type: String,
     default: null,
-
   },
   teacherEvaluated: {
-    type: String,
-    default: null
+    type: [String],
+    default: [], // <-- make it an array
+  },
+  evaluations: {
+    type: [mongoose.Schema.Types.ObjectId], // <-- store evaluation IDs
+    ref: "Evaluation",
+    default: [], // <-- make it an array
   },
   createdAt: {
     type: String,
@@ -33,10 +37,8 @@ function getDateValue() {
   const day = date.getDate();
   const month = date.toLocaleString("default", { month: "long" });
   const year = date.getFullYear();
-  let finaldate;
-
-  return (finaldate = `${month} ${day}, ${year}`);
+  return `${month} ${day}, ${year}`;
 }
 
-const Customer = mongoose.model("Student", studentSchema);
-module.exports = Customer;
+const Student = mongoose.model("Student", studentSchema);
+module.exports = Student;
