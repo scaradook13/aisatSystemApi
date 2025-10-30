@@ -60,13 +60,42 @@ class UserService {
     try {
       const { studentId, teacher, section, answers, comment } = payload;
   
-      if (!studentId || !teacher || !section || !answers || !comment) {
+      if (!studentId || !teacher || !section || !answers) {
         return { success: false, message: "Missing required fields." };
       }
+
+            const user = await User.findById(studentId).populate("profile");
+
+      if (!user) {
+        return { success: false, message: "User not found!" };
+      }
+
+      if (!user.profile) {
+        return { success: false, message: "Student profile not found for this user." };
+      }
+
+      const student = user.profile;
+      student.teacherEvaluated = student.teacherEvaluated || [];
+
+      if (student) {
+
+        if (student.teacherEvaluated.includes(teacher)) {
+          return { success: false, message: "You already evaluated this teacher." };
+        }
+
+        student.teacherEvaluated.push(teacher);
+
+        student.updatedAt = new Date().toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        await student.save();
+      }
   
-      // ✅ 1. Create a new evaluation
       const newEvaluation = new Evaluation({
-        studentId: [studentId],
+        studentId: studentId,
         teacher,
         section,
         answers: JSON.parse(JSON.stringify(answers)), // ensure plain object
@@ -75,7 +104,6 @@ class UserService {
   
       await newEvaluation.save();
   
-      // ✅ 2. Link evaluation ID to the active form
       const activeForm = await Form.findOne({ status: "active" });
       if (activeForm) {
         activeForm.evaluations.push(newEvaluation._id);
@@ -85,26 +113,6 @@ class UserService {
           year: "numeric",
         });
         await activeForm.save();
-      }
-  
-      // ✅ 3. Link evaluation to the student
-      const student = await Student.findById(studentId);
-      if (student) {
-        if (!student.evaluations.includes(newEvaluation._id)) {
-          student.evaluations.push(newEvaluation._id);
-        }
-  
-        if (!student.teacherEvaluated.includes(teacher)) {
-          student.teacherEvaluated.push(teacher);
-        }
-  
-        student.updatedAt = new Date().toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        });
-  
-        await student.save();
       }
   
       return {
@@ -117,6 +125,39 @@ class UserService {
       return { success: false, message: "Failed to add evaluation.", error };
     }
   }
+
+async getStudentInfo(userId) {
+  try {
+    // Fetch the user and populate their student profile
+    const user = await User.findById(userId)
+      .populate("profile")
+
+    if (!user) {
+      return { success: false, message: "User not found." };
+    }
+
+    // Optional: If you want a cleaner object (merged user + student data)
+    const studentInfo = {
+      _id: user._id,
+      email: user.email,
+      role: user.role,
+      isProfileComplete: user.isProfileComplete,
+      profile: {
+        _id: user.profile?._id,
+        fullName: user.profile?.fullName,
+        section: user.profile?.section,
+        studentNumber: user.profile?.studentNumber,
+        teacherEvaluated: user.profile?.teacherEvaluated || [],
+        updatedAt: user.profile?.updatedAt,
+      },
+    };
+
+    return { success: true, data: studentInfo };
+  } catch (error) {
+    console.error("Error fetching student info:", error);
+    return { success: false, message: "Failed to fetch student info.", error };
+  }
+}
 
 
 }

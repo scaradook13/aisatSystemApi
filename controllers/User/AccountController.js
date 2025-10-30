@@ -33,8 +33,20 @@ class UserController {
   // ===================== EVALUATION =====================
 addEvaluation = asyncTryCatch(async (req, res) => {
   const newEvaluation = await UserService.addEvaluation(req.body);
-  res.status(newEvaluation.success ? 201 : 400).json({ content: newEvaluation });
+  res
+    .status(newEvaluation.success ? 201 : 400)
+    .json(newEvaluation);
 });
+
+
+getStudentInfo = asyncTryCatch(async (req, res) => { // assuming the user ID is passed via URL
+  const studentInfo = await UserService.getStudentInfo(req.user.userId);
+
+  return res
+    .status(studentInfo.success ? 200 : 404)
+    .json(studentInfo);
+});
+
 
 }
 

@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const evaluationSchema = new mongoose.Schema({
-  studentId:[{
+  studentId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
-      }],
+      },
   teacher:{
     type: String,
     required: true,
@@ -19,6 +19,7 @@ const evaluationSchema = new mongoose.Schema({
   },
   comment:{
     type: String,
+    required: false
   },
   createdAt: {
     type: String,

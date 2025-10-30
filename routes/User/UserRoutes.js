@@ -13,4 +13,5 @@ router.post(
   AccountController.completeProfile
 );
 router.post("/addEvaluation", authMiddleware.verifySession, AccountController.addEvaluation);
+router.get("/getStudentInfo", authMiddleware.verifySession, AccountController.getStudentInfo);
 module.exports = router;

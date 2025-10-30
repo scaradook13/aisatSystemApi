@@ -17,11 +17,6 @@ const studentSchema = new mongoose.Schema({
     type: [String],
     default: [], // <-- make it an array
   },
-  evaluations: {
-    type: [mongoose.Schema.Types.ObjectId], // <-- store evaluation IDs
-    ref: "Evaluation",
-    default: [], // <-- make it an array
-  },
   createdAt: {
     type: String,
     default: getDateValue(),
