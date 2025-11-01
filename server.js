@@ -22,7 +22,6 @@ app.use(
 );
 app.use(morgan("dev"));
 
-// ✅ Routes
 app.use("/api/v1/", authRoutes);
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/", managementRoutes);

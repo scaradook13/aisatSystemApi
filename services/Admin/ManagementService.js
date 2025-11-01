@@ -6,49 +6,78 @@ const Category = require('../../models/Category.Model');
 const Question = require('../../models/Question.Model');
 const Form = require('../../models/Form.Model');
 const Evaluation = require('../../models/Evaluations.Model')
+const EnrolledStudent  = require('../../models/EnrolledStudent.Model')
 
 class ManagementService {
 
-  async addTeacher(payload) {
+    async addTeacher(payload) {
     try {
-      if (!payload || !payload.fullName || !payload.handleSections) {
+        if (!payload || !payload.fullName || !payload.handleSections) {
         return { success: false, message: 'Please fill up all required fields.' };
-      }
+        }
 
-      const handleSections = Array.isArray(payload.handleSections)
+        const handleSections = Array.isArray(payload.handleSections)
         ? payload.handleSections
         : [payload.handleSections];
 
-      const newTeacher = new Teacher({
-        fullName: payload.fullName.trim(),
+        const normalizedName = payload.fullName.trim();
+
+        const existingTeacher = await Teacher.findOne({
+        fullName: { $regex: new RegExp(`^${normalizedName}$`, 'i') },
+        });
+
+        if (existingTeacher) {
+        return {
+            success: false,
+            message: 'Teacher with this name already exists.',
+        };
+        }
+
+        const newTeacher = new Teacher({
+        fullName: normalizedName,
         handleSections,
-      });
+        });
 
-      await newTeacher.save();
-      return { success: true, message: 'Teacher added successfully.' };
+        await newTeacher.save();
+
+        return { success: true, message: 'Teacher added successfully.' };
     } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to add teacher.', error };
+        console.error(error);
+        return { success: false, message: 'Failed to add teacher.', error };
     }
-  }
+    }
 
-  async addSection(payload) {
+    async addSection(payload) {
     try {
-      if (!payload || !payload.section) {
+        if (!payload || !payload.section) {
         return { success: false, message: 'Please fill up all required fields.' };
-      }
+        }
 
-      const newSection = new Section({
-        section: payload.section.trim(),
-      });
+        const normalizedSection = payload.section.trim();
 
-      await newSection.save();
-      return { success: true, message: 'Section added successfully.' };
+        const existingSection = await Section.findOne({
+        section: { $regex: new RegExp(`^${normalizedSection}$`, 'i') },
+        });
+
+        if (existingSection) {
+        return {
+            success: false,
+            message: 'Section with this name already exists.',
+        };
+        }
+
+        const newSection = new Section({
+        section: normalizedSection,
+        });
+
+        await newSection.save();
+
+        return { success: true, message: 'Section added successfully.' };
     } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to add section.', error };
+        console.error(error);
+        return { success: false, message: 'Failed to add section.', error };
     }
-  }
+    }
 
   async getTeachers() {
     try {
@@ -91,57 +120,99 @@ class ManagementService {
     }
   }
 
-  async updateTeacher(id, payload) {
+    async updateTeacher(id, payload) {
     try {
-      if (!id) return { success: false, message: 'Teacher ID is required.' };
-      if (!payload || (!payload.fullName && !payload.handleSections)) {
+        if (!id) return { success: false, message: 'Teacher ID is required.' };
+        if (!payload || (!payload.fullName && !payload.handleSections)) {
         return { success: false, message: 'Please provide data to update.' };
-      }
+        }
 
-      const updatedTeacher = await Teacher.findByIdAndUpdate(
+        const normalizedName = payload.fullName ? payload.fullName.trim() : null;
+
+        if (normalizedName) {
+        const existingTeacher = await Teacher.findOne({
+            fullName: { $regex: new RegExp(`^${normalizedName}$`, 'i') },
+            _id: { $ne: id },
+        });
+
+        if (existingTeacher) {
+            return {
+            success: false,
+            message: 'A teacher with this name already exists.',
+            };
+        }
+        }
+
+        const updatedTeacher = await Teacher.findByIdAndUpdate(
         id,
         {
-          ...(payload.fullName && { fullName: payload.fullName.trim() }),
-          ...(payload.handleSections && { handleSections: payload.handleSections }),
-          updatedAt: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            ...(normalizedName && { fullName: normalizedName }),
+            ...(payload.handleSections && { handleSections: payload.handleSections }),
+            updatedAt: new Date().toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            }),
         },
         { new: true }
-      );
+        );
 
-      if (!updatedTeacher) {
+        if (!updatedTeacher) {
         return { success: false, message: 'Teacher not found.' };
-      }
+        }
 
-      return { success: true, message: 'Teacher updated successfully.', data: updatedTeacher };
+        return {
+        success: true,
+        message: 'Teacher updated successfully.',
+        data: updatedTeacher,
+        };
     } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to update teacher.', error };
+        console.error(error);
+        return { success: false, message: 'Failed to update teacher.', error };
     }
-  }
+    }
 
-  async updateSection(id, payload) {
+    async updateSection(id, payload) {
     try {
-      if (!id) return { success: false, message: 'Section ID is required.' };
-      if (!payload || !payload.section) {
+        if (!id) return { success: false, message: 'Section ID is required.' };
+        if (!payload || !payload.section) {
         return { success: false, message: 'Section name is required.' };
-      }
+        }
 
-      const updatedSection = await Section.findByIdAndUpdate(
+        const normalizedSection = payload.section.trim();
+
+        const existingSection = await Section.findOne({
+        section: { $regex: new RegExp(`^${normalizedSection}$`, 'i') },
+        _id: { $ne: id },
+        });
+
+        if (existingSection) {
+        return {
+            success: false,
+            message: 'A section with this name already exists.',
+        };
+        }
+
+        const updatedSection = await Section.findByIdAndUpdate(
         id,
-        { section: payload.section.trim() },
+        { section: normalizedSection },
         { new: true }
-      );
+        );
 
-      if (!updatedSection) {
+        if (!updatedSection) {
         return { success: false, message: 'Section not found.' };
-      }
+        }
 
-      return { success: true, message: 'Section updated successfully.', data: updatedSection };
+        return {
+        success: true,
+        message: 'Section updated successfully.',
+        data: updatedSection,
+        };
     } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to update section.', error };
+        console.error(error);
+        return { success: false, message: 'Failed to update section.', error };
     }
-  }
+    }
 
   async deleteTeacher(id) {
     try {
@@ -457,6 +528,105 @@ async getActiveForm() {
   } catch (error) {
     console.error(error);
     return { success: false, message: "Failed to delete form.", error };
+  }
+}
+
+async addEnrolledStudent(payload) {
+  try {
+    const { studentNumber, section, firstName, lastName, middleName } = payload;
+
+    if (!studentNumber || !section || !firstName || !lastName) {
+      return { success: false, message: "Please fill up all required fields." };
+    }
+
+    const normalizedStudentNumber = studentNumber.trim();
+    const normalizedSection = section.trim();
+    const normalizedFirstName = firstName.trim();
+    const normalizedLastName = lastName.trim();
+    const normalizedMiddleName = middleName ? middleName.trim() : "";
+
+    const existingStudent = await EnrolledStudent.findOne({
+      studentNumber: normalizedStudentNumber,
+      section: { $regex: new RegExp(`^${normalizedSection}$`, "i") },
+    });
+
+    if (existingStudent) {
+      return {
+        success: false,
+        message: "Student with this student number already exists in this section.",
+      };
+    }
+
+    const newStudent = new EnrolledStudent({
+      studentNumber: normalizedStudentNumber,
+      section: normalizedSection,
+      firstName: normalizedFirstName,
+      lastName: normalizedLastName,
+      middleName: normalizedMiddleName,
+    });
+
+    await newStudent.save();
+
+    return { success: true, message: "Student enrolled successfully.", data: newStudent };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to enroll student.", error };
+  }
+}
+
+async getAllEnrolledStudents() {
+  try {
+    const students = await EnrolledStudent.find();
+
+    if (!students.length) {
+      return { success: false, message: "No enrolled students found." };
+    }
+
+    return { success: true, data: students };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to retrieve enrolled students.", error };
+  }
+}
+
+async addEnrolledStudentExcel(payload) {
+  try {
+    // payload should be an array of student objects from the Excel file
+    if (!Array.isArray(payload) || payload.length === 0) {
+      return { success: false, message: "No data provided from Excel file." };
+    }
+
+    // Validate each record
+    const formattedStudents = payload
+      .map((s) => ({
+        studentNumber: s.studentNumber?.trim() || "",
+        section: s.section?.trim() || "",
+        firstName: s.firstName?.trim() || "",
+        lastName: s.lastName?.trim() || "",
+        middleName: s.middleName?.trim() || "",
+      }))
+      .filter((s) => s.studentNumber && s.firstName && s.lastName && s.section);
+
+    if (formattedStudents.length === 0) {
+      return { success: false, message: "No valid student records found in Excel." };
+    }
+
+    // Delete all existing enrolled students
+    await EnrolledStudent.deleteMany({});
+    console.log("All enrolled students deleted before importing Excel data.");
+
+    // Insert new ones
+    const insertedStudents = await EnrolledStudent.insertMany(formattedStudents);
+
+    return {
+      success: true,
+      message: "Excel data successfully imported. All previous records replaced.",
+      count: insertedStudents.length,
+      data: insertedStudents,
+    };
+  } catch (error) {
+    console.error("Error importing Excel data:", error);
+    return { success: false, message: "Failed to import Excel data.", error };
   }
 }
 

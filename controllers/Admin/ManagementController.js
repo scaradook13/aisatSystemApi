@@ -2,168 +2,161 @@ const ManagementService = require('../../services/Admin/ManagementService');
 const asyncTryCatch = require('../../utils/asyncTryAndCatch');
 
 class ManagementController {
-
   // 🧑‍🏫 Add Teacher
   addTeacher = asyncTryCatch(async (req, res) => {
-    const newTeacher = await ManagementService.addTeacher(req.body);
-    res.status(newTeacher.success ? 201 : 400).json({
-      content: newTeacher,
-    });
+    const result = await ManagementService.addTeacher(req.body);
+    res.status(result.success ? 201 : 400).json(result);
   });
 
   // 🏫 Add Section
   addSection = asyncTryCatch(async (req, res) => {
-    const newSection = await ManagementService.addSection(req.body);
-    res.status(newSection.success ? 201 : 400).json({
-      content: newSection,
-    });
+    const result = await ManagementService.addSection(req.body);
+    res.status(result.success ? 201 : 400).json(result);
   });
 
   // 📋 Get All Teachers
   getTeachers = asyncTryCatch(async (req, res) => {
-    const teachers = await ManagementService.getTeachers();
-    res.status(teachers.success ? 200 : 404).json({
-      content: teachers,
-    });
+    const result = await ManagementService.getTeachers();
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   // 🗂️ Get All Sections
   getSections = asyncTryCatch(async (req, res) => {
-    const sections = await ManagementService.getSections();
-    res.status(sections.success ? 200 : 404).json({
-      content: sections,
-    });
+    const result = await ManagementService.getSections();
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   // 👨‍🎓 Get All Students
   getStudents = asyncTryCatch(async (req, res) => {
-    const students = await ManagementService.getStudents();
-    res.status(students.success ? 200 : 404).json({
-      content: students,
-    });
+    const result = await ManagementService.getStudents();
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   // ✏️ Update Teacher
   updateTeacher = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const updatedTeacher = await ManagementService.updateTeacher(id, req.body);
-    res.status(updatedTeacher.success ? 200 : 400).json({
-      content: updatedTeacher,
-    });
+    const result = await ManagementService.updateTeacher(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
   });
 
   // ✏️ Update Section
   updateSection = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const updatedSection = await ManagementService.updateSection(id, req.body);
-    res.status(updatedSection.success ? 200 : 400).json({
-      content: updatedSection,
-    });
+    const result = await ManagementService.updateSection(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
   });
 
   // 🗑️ Delete Teacher
   deleteTeacher = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const deletedTeacher = await ManagementService.deleteTeacher(id);
-    res.status(deletedTeacher.success ? 200 : 404).json({
-      content: deletedTeacher,
-    });
+    const result = await ManagementService.deleteTeacher(id);
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   // 🗑️ Delete Section
   deleteSection = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const deletedSection = await ManagementService.deleteSection(id);
-    res.status(deletedSection.success ? 200 : 404).json({
-      content: deletedSection,
-    });
+    const result = await ManagementService.deleteSection(id);
+    res.status(result.success ? 200 : 404).json(result);
   });
 
-  // ✅ NEW: Update Student
+  // 👩‍🎓 Update Student
   updateStudent = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const updatedStudent = await ManagementService.updateStudent(id, req.body);
-    res.status(updatedStudent.success ? 200 : 400).json({
-      content: updatedStudent,
-    });
+    const result = await ManagementService.updateStudent(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
   });
 
-  // ✅ NEW: Delete Student
+  // 🧹 Delete Student
   deleteStudent = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const deletedStudent = await ManagementService.deleteStudent(id);
-    res.status(deletedStudent.success ? 200 : 404).json({
-      content: deletedStudent,
-    });
+    const result = await ManagementService.deleteStudent(id);
+    res.status(result.success ? 200 : 404).json(result);
   });
 
+  // ===================== FORM =====================
   addForm = asyncTryCatch(async (req, res) => {
-    const newForm = await ManagementService.addForm(req.body);
-    res.status(newForm.success ? 201 : 400).json({ content: newForm });
+    const result = await ManagementService.addForm(req.body);
+    res.status(result.success ? 201 : 400).json(result);
   });
 
   getForms = asyncTryCatch(async (req, res) => {
-    const forms = await ManagementService.getActiveForm();
-    res.status(forms.success ? 200 : 404).json({ content: forms });
+    const result = await ManagementService.getActiveForm();
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   updateForm = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const updatedForm = await ManagementService.updateForm(id, req.body);
-    res.status(updatedForm.success ? 200 : 400).json({ content: updatedForm });
+    const result = await ManagementService.updateForm(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
   });
 
   deleteForm = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const deletedForm = await ManagementService.deleteForm(id);
-    res.status(deletedForm.success ? 200 : 404).json({ content: deletedForm });
+    const result = await ManagementService.deleteForm(id);
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   // ===================== CATEGORY =====================
   addCategory = asyncTryCatch(async (req, res) => {
-    const newCategory = await ManagementService.addCategory(req.body);
-    res.status(newCategory.success ? 201 : 400).json({ content: newCategory });
+    const result = await ManagementService.addCategory(req.body);
+    res.status(result.success ? 201 : 400).json(result);
   });
 
   getCategories = asyncTryCatch(async (req, res) => {
-    const categories = await ManagementService.getCategories();
-    res.status(categories.success ? 200 : 404).json({ content: categories });
+    const result = await ManagementService.getCategories();
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   updateCategory = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const updatedCategory = await ManagementService.updateCategory(id, req.body);
-    res.status(updatedCategory.success ? 200 : 400).json({ content: updatedCategory });
+    const result = await ManagementService.updateCategory(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
   });
 
   deleteCategory = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const deletedCategory = await ManagementService.deleteCategory(id);
-    res.status(deletedCategory.success ? 200 : 404).json({ content: deletedCategory });
+    const result = await ManagementService.deleteCategory(id);
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   // ===================== QUESTION =====================
   addQuestion = asyncTryCatch(async (req, res) => {
-    const newQuestion = await ManagementService.addQuestion(req.body);
-    res.status(newQuestion.success ? 201 : 400).json({ content: newQuestion });
+    const result = await ManagementService.addQuestion(req.body);
+    res.status(result.success ? 201 : 400).json(result);
   });
 
   getQuestions = asyncTryCatch(async (req, res) => {
-    const questions = await ManagementService.getQuestions();
-    res.status(questions.success ? 200 : 404).json({ content: questions });
+    const result = await ManagementService.getQuestions();
+    res.status(result.success ? 200 : 404).json(result);
   });
 
   updateQuestion = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const updatedQuestion = await ManagementService.updateQuestion(id, req.body);
-    res.status(updatedQuestion.success ? 200 : 400).json({ content: updatedQuestion });
+    const result = await ManagementService.updateQuestion(id, req.body);
+    res.status(result.success ? 200 : 400).json(result);
   });
 
   deleteQuestion = asyncTryCatch(async (req, res) => {
     const { id } = req.params;
-    const deletedQuestion = await ManagementService.deleteQuestion(id);
-    res.status(deletedQuestion.success ? 200 : 404).json({ content: deletedQuestion });
+    const result = await ManagementService.deleteQuestion(id);
+    res.status(result.success ? 200 : 404).json(result);
   });
+
+  addEnrolledStudent = asyncTryCatch(async (req, res) => {
+    const result = await ManagementService.addEnrolledStudent(req.body);
+    res.status(result.success ? 201 : 400).json(result);
+  });
+
+  getAllEnrolledStudents = asyncTryCatch(async (req, res) => {
+    const result = await ManagementService.getAllEnrolledStudents();
+    res.status(result.success ? 200 : 404).json(result);
+  });
+
+  addEnrolledStudentExcel = asyncTryCatch(async (req, res) => {
+    const result = await ManagementService.addEnrolledStudentExcel(req.body);
+    res.status(result.success ? 201 : 400).json(result);
+  });  
 }
 
 module.exports = new ManagementController();

@@ -39,4 +39,8 @@ router.get("/getQuestions", AuthMiddleware.verifySession, ManagementController.g
 router.patch("/updateQuestion/:id", adminAuthMiddleware.verifySession, ManagementController.updateQuestion);
 router.delete("/deleteQuestion/:id", adminAuthMiddleware.verifySession, ManagementController.deleteQuestion);
 
+router.post("/addEnrolledStudent", adminAuthMiddleware.verifySession, ManagementController.addEnrolledStudent);
+router.get("/getAllEnrolledStudents", adminAuthMiddleware.verifySession, ManagementController.getAllEnrolledStudents);
+router.post("/addEnrolledStudentExcel", adminAuthMiddleware.verifySession, ManagementController.addEnrolledStudentExcel);
+
 module.exports = router;

@@ -18,7 +18,7 @@ const sendEmail = async (to, subject, templateName, context) => {
   const compiledTemplate = handlebars.compile(source);
 
   const mailOptions = {
-    from: `"Admin" <${process.env.EMAIL_USER}>`,
+    from: `"AISAT BALIWAG" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html: compiledTemplate(context),
