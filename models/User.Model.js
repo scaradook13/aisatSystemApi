@@ -19,11 +19,11 @@ const userSchema = new mongoose.Schema({
   },
   status: {
     type: Number,
-    default: 0, // 0 meaning unverified email
+    default: 1, // 0 meaning unverified email
   },
   isProfileComplete: {
     type: Boolean,
-    default: false, // 0 meaning incomplete information 
+    default: true, // 0 meaning incomplete information 
   },
   profile: {
     // Different profiles based on the role

@@ -10,24 +10,25 @@ class UserController {
   });
 
   createUser = asyncTryCatch(async (req, res, next) => {
-    const response = await UserService.createUser(req.body);
-    req.email = response.email; // pass data to next middleware
-    next();
-  });
+  const response = await UserService.createUserRequest(req.body);
+
+  if (!response.success) {
+    return res.status(400).json(response);
+  }
+
+  req.email = response.email;
+  next();
+});
+
 
   verifyUserAccount = asyncTryCatch(async (req, res) => {
-    const response = await UserService.verifyUser(req.body);
-    if (response === 'Account verified!') return res.status(200).json(response);
-    if (response === 'Invalid OTP') return res.status(409).json(response);
-    if (response === 'You enter expired OTP') return res.status(409).json(response);
-  });
+    const response = await UserService.verifyUserAndCreate(req.body);
 
-  completeProfile = asyncTryCatch(async (req, res) => {
-    const newProfile = await UserService.completeProfile(req.user.userId, req.body);
-    res.status(201).json({
-      message: "newProfile added",
-      content: newProfile,
-    });
+    if (!response.success) {
+      return res.status(400).json(response);
+    }
+
+    return res.status(200).json(response);
   });
 
   // ===================== EVALUATION =====================

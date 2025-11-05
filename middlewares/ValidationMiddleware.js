@@ -37,9 +37,6 @@ class ValidationChecker {
 
             if (!isMatch) throw new Error('Invalid Credentials')
 
-            if (userData && userData?.status === 0) {
-                return res.status(409).json(`The email you've used is already registered but not verified.`);
-            }
             req.id = userData._id
             next();
         } catch (error) {

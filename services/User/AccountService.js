@@ -3,58 +3,93 @@ const Student = require('../../models/Student.Model');
 const Form = require('../../models/Form.Model');
 const Evaluation = require('../../models/Evaluations.Model')
 const Otp = require("../../models/OTP.Model");
+const EnrolledStudent = require("../../models/EnrolledStudent.Model")
 const bcrypt = require("bcryptjs");
 
 class UserService {
-  async createUser(payload) {
-    const hashedPassword = await bcrypt.hash(payload.password, 10);
-    const newUser = new User({
-      email: payload.email,
-      password: hashedPassword,
-      role: 'Student',
-    });
 
-    const studentInformation = new Student({
-      studentNumber: payload.studentNumber
-    });
+  async createUserRequest(payload) {
+  const { email, studentNumber, firstName, lastName, middleName } = payload;
 
-   
-    await Promise.all([newUser.save(), studentInformation.save()]);
+  const enrolled = await EnrolledStudent.findOne({
+    studentNumber,
+    firstName,
+    lastName,
+    middleName: middleName || ""
+  });
 
-    // Update the user profile with the customer information
-    newUser.profile = studentInformation._id;
-    await newUser.save();
-    return { email: newUser.email };
+  if (!enrolled) {
+    return { success: false, message: "Invalid credentials. Student not found in records." };
   }
 
-  async verifyUser(payload) {
-    const foundUser = await Otp.findOne({ userEmail: payload.email });
-    if (!foundUser) return 'You enter expired OTP'
-    if (foundUser?.otp === payload.otp) {
-      const result = await User.updateOne({
-        email: payload.email
-      }, { $set: { status: 1 } })
-      if (result.matchedCount > 0 && result.modifiedCount) return 'Account verified!'
-    } return 'Invalid OTP'
-
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return { success: false, message: "Email already registered" };
   }
 
-  async completeProfile(id, payload) {
-    const userInfo = await User.findOne({ _id: id }).exec();
-
-    await Student.updateOne({ _id: userInfo.profile },
-      {
-        $set: {
-          fullName: payload.fullName,
-          section: payload.section,
-        },
-      }
-    );
-
-    userInfo.isProfileComplete = true;
-
-    await userInfo.save();
+  const usedStudent = await Student.findOne({ studentNumber });
+  if (usedStudent) {
+    return {
+      success: false,
+      message: "Student account already created. Student number is already used."
+    };
   }
+
+  return {
+    success: true,
+    email,
+    message: "Student found. Proceed to OTP verification."
+  };
+}
+
+
+async verifyUserAndCreate(payload) {
+  const { otp, email, password, studentNumber, firstName, lastName, middleName } = payload;
+
+  const foundUser = await Otp.findOne({ userEmail: email });
+  if (!foundUser) {
+    return { success: false, message: "OTP expired or not found" };
+  }
+
+  if (foundUser.otp !== otp) {
+    return { success: false, message: "Invalid OTP" };
+  }
+
+  // ✅ OTP is valid — continue account creation
+  const enrolled = await EnrolledStudent.findOne({
+    studentNumber,
+    firstName,
+    lastName,
+    middleName: middleName || ""
+  });
+
+  if (!enrolled) {
+    return { success: false, message: "Student record mismatch" };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const student = new Student({
+    fullName: `${firstName} ${middleName} ${lastName}`.trim(),
+    studentNumber,
+    section: enrolled.section,
+  });
+
+  const user = new User({
+    email,
+    password: hashedPassword,
+    role: "Student",
+    profile: student._id,
+  });
+
+  await student.save();
+  await user.save();
+  await Otp.deleteOne({ userEmail: email });
+
+  return { success: true, message: "Account Created successfully!" };
+}
+
+
 
   async addEvaluation(payload) {
     try {

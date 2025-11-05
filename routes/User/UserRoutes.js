@@ -7,11 +7,6 @@ const ValidationChecker = require('../../middlewares/ValidationMiddleware')
 // Local Account
 router.post("/createUser", ValidationChecker.validateRegistration, AccountController.createUser, authMiddleware.sendAndSaveOtp);
 router.post("/verifyUser", AccountController.verifyUserAccount);
-router.post(
-  "/completeProfile",
-  authMiddleware.verifySession,
-  AccountController.completeProfile
-);
 router.post("/addEvaluation", authMiddleware.verifySession, AccountController.addEvaluation);
 router.get("/getStudentInfo", authMiddleware.verifySession, AccountController.getStudentInfo);
 module.exports = router;
