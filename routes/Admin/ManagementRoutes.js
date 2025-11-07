@@ -26,6 +26,7 @@ router.post("/addForm", adminAuthMiddleware.verifySession, ManagementController.
 router.get("/getForms", AuthMiddleware.verifySession, ManagementController.getForms);
 router.patch("/updateForm/:id", adminAuthMiddleware.verifySession, ManagementController.updateForm);
 router.delete("/deleteForm/:id", adminAuthMiddleware.verifySession, ManagementController.deleteForm);
+router.get("/getAllActiveEvaluations", adminAuthMiddleware.verifySession, ManagementController.getAllEvaluationsFromActiveForm);
 
 // ===================== CATEGORIES =====================
 router.post("/addCategory", adminAuthMiddleware.verifySession, ManagementController.addCategory);

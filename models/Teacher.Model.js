@@ -13,6 +13,10 @@ const teacherSchema = new mongoose.Schema({
       message: "At least one section must be provided",
     },
   },
+  employmentType: {
+    type: String,
+    required: true,
+  },
   createdAt: {
     type: String,
     default: getDateValue(),

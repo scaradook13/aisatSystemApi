@@ -12,7 +12,7 @@ class ManagementService {
 
     async addTeacher(payload) {
     try {
-        if (!payload || !payload.fullName || !payload.handleSections) {
+        if (!payload || !payload.fullName || !payload.handleSections || !payload.employmentType) {
         return { success: false, message: 'Please fill up all required fields.' };
         }
 
@@ -36,6 +36,7 @@ class ManagementService {
         const newTeacher = new Teacher({
         fullName: normalizedName,
         handleSections,
+        employmentType: payload.employmentType
         });
 
         await newTeacher.save();
@@ -148,6 +149,7 @@ class ManagementService {
         {
             ...(normalizedName && { fullName: normalizedName }),
             ...(payload.handleSections && { handleSections: payload.handleSections }),
+            ...(payload.employmentType && { employmentType: payload.employmentType }),
             updatedAt: new Date().toLocaleDateString('en-US', {
             month: 'long',
             day: 'numeric',
@@ -629,6 +631,33 @@ async addEnrolledStudentExcel(payload) {
     return { success: false, message: "Failed to import Excel data.", error };
   }
 }
+
+async getAllEvaluationsFromActiveForm() {
+  try {
+
+    const activeForm = await Form.findOne({ status: "active" })
+      .populate({ path: "evaluations" });
+
+    if (!activeForm) {
+      return { success: false, message: "No active form found." };
+    }
+
+    return {
+      success: true,
+      message: "Evaluations fetched successfully.",
+      data: activeForm.evaluations
+    };
+
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Failed to fetch evaluations.",
+      error
+    };
+  }
+}
+
 
 
 }

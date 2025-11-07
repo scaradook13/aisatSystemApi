@@ -157,6 +157,11 @@ class ManagementController {
     const result = await ManagementService.addEnrolledStudentExcel(req.body);
     res.status(result.success ? 201 : 400).json(result);
   });  
+
+  getAllEvaluationsFromActiveForm = asyncTryCatch(async (req, res) => {
+    const result = await ManagementService.getAllEvaluationsFromActiveForm();
+    res.status(result.success ? 200 : 404).json(result);
+  });
 }
 
 module.exports = new ManagementController();
