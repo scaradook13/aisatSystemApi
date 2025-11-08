@@ -13,9 +13,9 @@ class UserService {
 
   const enrolled = await EnrolledStudent.findOne({
     studentNumber,
-    firstName,
-    lastName,
-    middleName: middleName || ""
+    firstName: { $regex: new RegExp(`^${firstName}$`, "i") },
+    lastName: { $regex: new RegExp(`^${lastName}$`, "i") },
+    middleName: { $regex: new RegExp(`^${middleName || ""}$`, "i") },
   });
 
   if (!enrolled) {
@@ -55,12 +55,11 @@ async verifyUserAndCreate(payload) {
     return { success: false, message: "Invalid OTP" };
   }
 
-  // ✅ OTP is valid — continue account creation
   const enrolled = await EnrolledStudent.findOne({
     studentNumber,
-    firstName,
-    lastName,
-    middleName: middleName || ""
+    firstName: { $regex: new RegExp(`^${firstName}$`, "i") },
+    lastName: { $regex: new RegExp(`^${lastName}$`, "i") },
+    middleName: { $regex: new RegExp(`^${middleName || ""}$`, "i") },
   });
 
   if (!enrolled) {
@@ -70,8 +69,8 @@ async verifyUserAndCreate(payload) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const student = new Student({
-    fullName: `${firstName} ${middleName} ${lastName}`.trim(),
-    studentNumber,
+    fullName: `${enrolled.firstName} ${enrolled.middleName || ""} ${enrolled.lastName}`.trim(),
+    studentNumber: enrolled.studentNumber,
     section: enrolled.section,
   });
 
@@ -84,10 +83,12 @@ async verifyUserAndCreate(payload) {
 
   await student.save();
   await user.save();
+
   await Otp.deleteOne({ userEmail: email });
 
-  return { success: true, message: "Account Created successfully!" };
+  return { success: true, message: "Account created successfully!" };
 }
+
 
 
 

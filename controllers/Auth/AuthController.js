@@ -1,6 +1,7 @@
 const User = require('../../models/User.Model');
 const AuthService = require('../../services/Auth/AuthService');
 const asyncTryCatch = require('../../utils/asyncTryAndCatch');
+const authMiddleware = require('../../middlewares/authMiddleware')
 
 class AuthController {
   login = asyncTryCatch(async (req, res) => {
@@ -39,6 +40,22 @@ class AuthController {
     sameSite: "none",
   });
   return res.status(200).json({ message: "Logout successful" });
+});
+
+resendVerificationCode = asyncTryCatch(async (req, res) => {
+    const { email } = req.body;
+    const result = await authMiddleware.resendVerificationCode({ email });
+    return res.status(result.success ? 200 : 400).json(result);
+  });
+
+requestForgotPassword = asyncTryCatch(async (req, res) => {
+  const result = await authMiddleware.requestForgotPassword(req.body);
+  return res.status(result.success ? 200 : 400).json(result);
+});
+
+verifyForgotPassword = asyncTryCatch(async (req, res) => {
+  const result = await authMiddleware.verifyForgotPassword(req.body);
+  return res.status(result.success ? 200 : 400).json(result);
 });
 
 }

@@ -464,6 +464,8 @@ async addForm(payload) {
       { $set: { status: "archive", updatedAt: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) } }
     );
 
+    await Student.updateMany({}, { $set: { teacherEvaluated: [] } });
+
     // Create new active form
     const newForm = new Form({ formDate, formData: [], status: "active" });
     await newForm.save();
@@ -657,6 +659,162 @@ async getAllEvaluationsFromActiveForm() {
     };
   }
 }
+
+async updateEnrolledStudent(id, payload) {
+  try {
+    if (!id) {
+      return { success: false, message: "Student ID is required." };
+    }
+
+    const { studentNumber, section, firstName, lastName, middleName } = payload || {};
+
+    if (!studentNumber && !section && !firstName && !lastName && !middleName) {
+      return { success: false, message: "No data provided to update." };
+    }
+
+    // Normalize values
+    const normalizedData = {};
+    if (studentNumber) normalizedData.studentNumber = studentNumber.trim();
+    if (section) normalizedData.section = section.trim();
+    if (firstName) normalizedData.firstName = firstName.trim();
+    if (lastName) normalizedData.lastName = lastName.trim();
+    if (middleName !== undefined) normalizedData.middleName = middleName?.trim() || "";
+
+    // Prevent duplicate student number in same section
+    if (studentNumber && section) {
+      const existingStudent = await EnrolledStudent.findOne({
+        _id: { $ne: id },
+        studentNumber: normalizedData.studentNumber,
+        section: { $regex: new RegExp(`^${normalizedData.section}$`, "i") },
+      });
+
+      if (existingStudent) {
+        return {
+          success: false,
+          message: "Another student with this student number already exists in this section.",
+        };
+      }
+    }
+
+    // Perform update
+    const updatedStudent = await EnrolledStudent.findByIdAndUpdate(
+      id,
+      {
+        ...normalizedData,
+        updatedAt: new Date().toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }),
+      },
+      { new: true }
+    );
+
+    if (!updatedStudent) {
+      return { success: false, message: "Student not found." };
+    }
+
+    return { success: true, message: "Student updated successfully.", data: updatedStudent };
+  } catch (error) {
+    console.error("Error updating enrolled student:", error);
+    return { success: false, message: "Failed to update student.", error };
+  }
+}
+
+async deleteEnrolledStudent(id) {
+  try {
+    if (!id) {
+      return { success: false, message: "Student ID is required." };
+    }
+
+    const deletedStudent = await EnrolledStudent.findByIdAndDelete(id);
+    if (!deletedStudent) {
+      return { success: false, message: "Student not found." };
+    }
+
+    return { success: true, message: "Student deleted successfully." };
+  } catch (error) {
+    console.error("Error deleting enrolled student:", error);
+    return { success: false, message: "Failed to delete student.", error };
+  }
+}
+
+async addFormCopy(payload) {
+  try {
+    const { formDate } = payload;
+    if (!formDate) {
+      return { success: false, message: "Form date is required." };
+    }
+
+    await Form.updateMany(
+      { status: "active" },
+      {
+        $set: {
+          status: "archive",
+          updatedAt: new Date().toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          }),
+        },
+      }
+    );
+
+    const previousForm = await Form.findOne({ status: "archive" })
+      .sort({ createdAt: -1 })
+      .populate({ path: "formData", populate: { path: "questionsIds" } });
+
+    if (!previousForm) {
+      return {
+        success: false,
+        message: "No previous form found to copy from.",
+      };
+    }
+
+    await Student.updateMany({}, { $set: { teacherEvaluated: [] } });
+
+    const newCategoryIds = [];
+
+    for (const category of previousForm.formData) {
+      // Duplicate each question
+      const newQuestionIds = [];
+      for (const question of category.questionsIds) {
+        const newQuestion = new Question({
+          id: question.id,
+          text: question.text,
+        });
+        await newQuestion.save();
+        newQuestionIds.push(newQuestion._id);
+      }
+
+      // Duplicate category with new question IDs
+      const newCategory = new Category({
+        title: category.title,
+        questionsIds: newQuestionIds,
+      });
+      await newCategory.save();
+      newCategoryIds.push(newCategory._id);
+    }
+
+    const newForm = new Form({
+      formDate,
+      formData: newCategoryIds,
+      status: "active",
+    });
+    await newForm.save();
+
+    return {
+      success: true,
+      message:
+        "Form copied successfully from previous structure. Previous forms archived.",
+      data: newForm,
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to copy form.", error };
+  }
+}
+
 
 
 

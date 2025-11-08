@@ -27,6 +27,7 @@ router.get("/getForms", AuthMiddleware.verifySession, ManagementController.getFo
 router.patch("/updateForm/:id", adminAuthMiddleware.verifySession, ManagementController.updateForm);
 router.delete("/deleteForm/:id", adminAuthMiddleware.verifySession, ManagementController.deleteForm);
 router.get("/getAllActiveEvaluations", adminAuthMiddleware.verifySession, ManagementController.getAllEvaluationsFromActiveForm);
+router.post("/addFormCopy", adminAuthMiddleware.verifySession, ManagementController.addFormCopy);
 
 // ===================== CATEGORIES =====================
 router.post("/addCategory", adminAuthMiddleware.verifySession, ManagementController.addCategory);
@@ -43,5 +44,7 @@ router.delete("/deleteQuestion/:id", adminAuthMiddleware.verifySession, Manageme
 router.post("/addEnrolledStudent", adminAuthMiddleware.verifySession, ManagementController.addEnrolledStudent);
 router.get("/getAllEnrolledStudents", adminAuthMiddleware.verifySession, ManagementController.getAllEnrolledStudents);
 router.post("/addEnrolledStudentExcel", adminAuthMiddleware.verifySession, ManagementController.addEnrolledStudentExcel);
+router.patch("/updateEnrolledStudent/:id", adminAuthMiddleware.verifySession, ManagementController.updateEnrolledStudent);
+router.delete("/deleteEnrolledStudent/:id", adminAuthMiddleware.verifySession, ManagementController.deleteEnrolledStudent);
 
 module.exports = router;

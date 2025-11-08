@@ -30,7 +30,7 @@ class ValidationChecker {
             const userData = await User.findOne({ email: email });
 
             if (!userData) {
-                return res.status(409).json("This email is not registered");
+                return res.status(409).json("Invalid Credentials");
             }
             const isMatch = await bcrypt.compare(password, userData.password);
 
