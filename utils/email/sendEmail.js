@@ -1,30 +1,22 @@
-require("dotenv").config();
-const nodemailer = require("nodemailer");
-const fs = require("fs");
-const handlebars = require("handlebars");
-const path = require("path");
+import { Resend } from "resend";
+import fs from "fs";
+import path from "path";
+import handlebars from "handlebars";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (to, subject, templateName, context) => {
   const templatePath = path.join(__dirname, "template", `${templateName}.handlebars`);
   const source = fs.readFileSync(templatePath, "utf8");
   const compiledTemplate = handlebars.compile(source);
+  const html = compiledTemplate(context);
 
-  const mailOptions = {
-    from: `"AISAT BALIWAG" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: "AISAT BALIWAG <no-reply@aisatsystem.com>",
     to,
     subject,
-    html: compiledTemplate(context),
-  };
-
-  await transporter.sendMail(mailOptions);
+    html,
+  });
 };
 
-module.exports = sendEmail;
+export default sendEmail;
