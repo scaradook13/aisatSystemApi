@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
+const serverless = require("serverless-http");
 require("dotenv").config();
 require("./config/database_connections");
 require("./utils/email/emailQueue");
@@ -29,6 +30,7 @@ app.use("/api/v1/", managementRoutes);
 app.use("/api/v1/admin", adminRoutes);
 
 module.exports = app;
+module.exports = serverless(app);
 
 // const PORT = process.env.PORT || 3000;
 // app.listen(PORT, () => {
