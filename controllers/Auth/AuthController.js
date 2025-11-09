@@ -34,13 +34,26 @@ class AuthController {
 
 
   logout = asyncTryCatch(async (req, res) => {
-  res.clearCookie("jwt", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
-  return res.status(200).json({ message: "Logout successful" });
+  try {
+    // Use await in case clearCookie is asynchronous in your environment
+    await Promise.resolve(
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      })
+    );
+
+    // Simulate a small delay if needed (e.g., slow server or cleanup tasks)
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Logout failed:", error);
+    return res.status(500).json({ message: "Logout failed", error });
+  }
 });
+
 
 resendVerificationCode = asyncTryCatch(async (req, res) => {
     const { email } = req.body;
