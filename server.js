@@ -1,9 +1,7 @@
 const express = require("express");
-const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
 require("dotenv").config();
 require("./config/database_connections");
 require("./utils/email/emailQueue");
@@ -13,23 +11,30 @@ const userRoutes = require("./routes/User/UserRoutes");
 const adminRoutes = require("./routes/Admin/AdminRoutes");
 const managementRoutes = require("./routes/Admin/ManagementRoutes");
 
+const app = express();
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://aisat-system-client.vercel.app"
+      "https://aisat-system-client.vercel.app",
     ],
     credentials: true,
   })
 );
 app.use(morgan("dev"));
 
-app.use("/api/v1/", authRoutes);
-app.use("/api/v1/", userRoutes);
-app.use("/api/v1/", managementRoutes);
+// ✅ your routes
+app.use("/api/v1", authRoutes);
+app.use("/api/v1", userRoutes);
+app.use("/api/v1", managementRoutes);
 app.use("/api/v1/admin", adminRoutes);
 
-// ✅ Export only the app itself
+// ✅ a quick test route
+app.get("/api/v1/ping", (req, res) => {
+  res.status(200).json({ success: true, message: "API connected" });
+});
+
 module.exports = app;

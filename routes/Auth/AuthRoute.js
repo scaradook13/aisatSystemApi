@@ -20,8 +20,8 @@ router.get('/auth/user', AuthMiddleware.verifySession, AuthController.getCurrent
 // Logout
 router.get('/auth/logout', AuthController.logout);
 
-router.get("/ping", (req, res) => {
-  res.status(200).json({ success: true, message: "API connected" });
-});
+// router.get("/ping", (req, res) => {
+//   res.status(200).json({ success: true, message: "API connected" });
+// });
 
 module.exports = router;
