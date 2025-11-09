@@ -28,9 +28,9 @@ app.use("/api/v1/", userRoutes);
 app.use("/api/v1/", managementRoutes);
 app.use("/api/v1/admin", adminRoutes);
 
+module.exports = app;
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-module.exports = app;
