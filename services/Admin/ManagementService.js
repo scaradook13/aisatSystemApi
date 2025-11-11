@@ -79,46 +79,48 @@ class ManagementService {
     }
     }
 
-  async getTeachers() {
-    try {
-      const teachers = await Teacher.find();
-      if (!teachers.length) {
-        return { success: false, message: 'No teachers found.' };
+    async getTeachers() {
+      try {
+        const teachers = await Teacher.find();
+        return {
+          success: true,
+          data: teachers,
+          message: teachers.length ? 'Teachers retrieved successfully.' : 'No teachers found.',
+        };
+      } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Failed to retrieve teachers.', error };
       }
-      return { success: true, data: teachers };
-    } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to retrieve teachers.', error };
     }
-  }
 
-  async getSections() {
-    try {
-      const sections = await Section.find();
-      if (!sections.length) {
-        return { success: false, message: 'No sections found.' };
+    async getSections() {
+      try {
+        const sections = await Section.find();
+        return {
+          success: true,
+          data: sections,
+          message: sections.length ? 'Sections retrieved successfully.' : 'No sections found.',
+        };
+      } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Failed to retrieve sections.', error };
       }
-      return { success: true, data: sections };
-    } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to retrieve sections.', error };
     }
-  }
 
-  async getStudents() {
-    try {
-      const students = await Student.find();
-
-      if (!students.length) {
-        return { success: false, message: 'No students found.' };
+    async getStudents() {
+      try {
+        const students = await Student.find();
+        return {
+          success: true,
+          data: students,
+          message: students.length ? 'Students retrieved successfully.' : 'No students found.',
+        };
+      } catch (error) {
+        console.error(error);
+        return { success: false, message: 'Failed to retrieve students.', error };
       }
-
-      return { success: true, data: students };
-    } catch (error) {
-      console.error(error);
-      return { success: false, message: 'Failed to retrieve students.', error };
     }
-  }
+
 
     async updateTeacher(id, payload) {
     try {

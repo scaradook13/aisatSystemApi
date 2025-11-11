@@ -26,7 +26,7 @@ app.use(morgan("dev"));
 app.use("/api/v1/", authRoutes);
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/", managementRoutes);
-app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/", adminRoutes);
 
 module.exports = app;
 

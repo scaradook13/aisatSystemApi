@@ -12,6 +12,7 @@ class UserService {
   const { email, studentNumber, firstName, lastName, middleName } = payload;
 
   const enrolled = await EnrolledStudent.findOne({
+    studentEmail: email,
     studentNumber,
     firstName: { $regex: new RegExp(`^${firstName}$`, "i") },
     lastName: { $regex: new RegExp(`^${lastName}$`, "i") },
@@ -56,6 +57,7 @@ async verifyUserAndCreate(payload) {
   }
 
   const enrolled = await EnrolledStudent.findOne({
+    studentEmail: email,
     studentNumber,
     firstName: { $regex: new RegExp(`^${firstName}$`, "i") },
     lastName: { $regex: new RegExp(`^${lastName}$`, "i") },
