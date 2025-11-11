@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     refPath: "role",
   },
+  authProvider: {
+  type: String,
+  enum: ["local", "firebase"],
+  default: "local",
+  },
   createdAt: {
     type: String,
     default: getDateValue(),

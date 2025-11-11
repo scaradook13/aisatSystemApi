@@ -9,6 +9,12 @@ function getDateValue() {
 }
 
 const enrolledStudentSchema = new mongoose.Schema({
+  studentEmail: {
+    type: String,
+    unique: true,
+    sparse: true,
+    index: true
+  },
   studentNumber: {
     type: String,
     required: true,

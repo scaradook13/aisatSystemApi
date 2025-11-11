@@ -5,7 +5,6 @@ const Student = require('../../models/Student.Model');
 const Category = require('../../models/Category.Model');
 const Question = require('../../models/Question.Model');
 const Form = require('../../models/Form.Model');
-const Evaluation = require('../../models/Evaluations.Model')
 const EnrolledStudent  = require('../../models/EnrolledStudent.Model')
 
 class ManagementService {
@@ -537,13 +536,14 @@ async getActiveForm() {
 
 async addEnrolledStudent(payload) {
   try {
-    const { studentNumber, section, firstName, lastName, middleName } = payload;
+    const { studentNumber, section, firstName, lastName, middleName, email } = payload;
 
-    if (!studentNumber || !section || !firstName || !lastName) {
+    if (!studentNumber || !section || !firstName || !lastName || !email) {
       return { success: false, message: "Please fill up all required fields." };
     }
 
     const normalizedStudentNumber = studentNumber.trim();
+    const normalizedEmail = email.trim();
     const normalizedSection = section.trim();
     const normalizedFirstName = firstName.trim();
     const normalizedLastName = lastName.trim();
@@ -562,6 +562,7 @@ async addEnrolledStudent(payload) {
     }
 
     const newStudent = new EnrolledStudent({
+      studentEmail: normalizedEmail,
       studentNumber: normalizedStudentNumber,
       section: normalizedSection,
       firstName: normalizedFirstName,
@@ -595,21 +596,36 @@ async getAllEnrolledStudents() {
 
 async addEnrolledStudentExcel(payload) {
   try {
-    // payload should be an array of student objects from the Excel file
+
     if (!Array.isArray(payload) || payload.length === 0) {
       return { success: false, message: "No data provided from Excel file." };
     }
 
     // Validate each record
     const formattedStudents = payload
-      .map((s) => ({
-        studentNumber: s.studentNumber?.trim() || "",
-        section: s.section?.trim() || "",
-        firstName: s.firstName?.trim() || "",
-        lastName: s.lastName?.trim() || "",
-        middleName: s.middleName?.trim() || "",
-      }))
-      .filter((s) => s.studentNumber && s.firstName && s.lastName && s.section);
+      .map((s, index) => {
+        const studentEmail = String(s.email || s.studentEmail || "").trim();
+        const studentNumber = String(s.studentNumber || "").trim();
+        const section = String(s.section || "").trim();
+        const firstName = String(s.firstName || "").trim();
+        const lastName = String(s.lastName || "").trim();
+        const middleName = String(s.middleName || "").trim();
+
+        // Skip invalid rows but log them
+        if (!studentEmail || !studentNumber || !firstName || !lastName || !section) {
+          return null;
+        }
+
+        return {
+          studentEmail,
+          studentNumber,
+          section,
+          firstName,
+          lastName,
+          middleName,
+        };
+      })
+      .filter(Boolean);
 
     if (formattedStudents.length === 0) {
       return { success: false, message: "No valid student records found in Excel." };
@@ -666,14 +682,15 @@ async updateEnrolledStudent(id, payload) {
       return { success: false, message: "Student ID is required." };
     }
 
-    const { studentNumber, section, firstName, lastName, middleName } = payload || {};
+    const { email, studentNumber, section, firstName, lastName, middleName } = payload || {};
 
-    if (!studentNumber && !section && !firstName && !lastName && !middleName) {
+    if (!email && !studentNumber && !section && !firstName && !lastName && !middleName) {
       return { success: false, message: "No data provided to update." };
     }
 
     // Normalize values
     const normalizedData = {};
+    if (email) normalizedData.studentEmail = email.trim();
     if (studentNumber) normalizedData.studentNumber = studentNumber.trim();
     if (section) normalizedData.section = section.trim();
     if (firstName) normalizedData.firstName = firstName.trim();

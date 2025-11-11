@@ -58,6 +58,27 @@ verifyForgotPassword = asyncTryCatch(async (req, res) => {
   return res.status(result.success ? 200 : 400).json(result);
 });
 
+googleLogin = asyncTryCatch(async (req, res) => {
+    const result = await AuthService.googleLogin(req.body);
+
+    if (!result.success) {
+      return res.status(result.status || 400).json(result);
+    }
+
+    // Send JWT cookie
+    res.cookie("jwt", result.token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      user: result.user,
+    });
+  });
+
 }
 
 module.exports = new AuthController();
