@@ -538,14 +538,14 @@ async getActiveForm() {
 
 async addEnrolledStudent(payload) {
   try {
-    const { studentNumber, section, firstName, lastName, middleName, email } = payload;
+    const { studentNumber, section, firstName, lastName, middleName, studentEmail } = payload;
 
-    if (!studentNumber || !section || !firstName || !lastName || !email) {
+    if (!studentNumber || !section || !firstName || !lastName || !studentEmail) {
       return { success: false, message: "Please fill up all required fields." };
     }
 
     const normalizedStudentNumber = studentNumber.trim();
-    const normalizedEmail = email.trim();
+    const normalizedEmail = studentEmail.trim();
     const normalizedSection = section.trim();
     const normalizedFirstName = firstName.trim();
     const normalizedLastName = lastName.trim();
@@ -684,15 +684,15 @@ async updateEnrolledStudent(id, payload) {
       return { success: false, message: "Student ID is required." };
     }
 
-    const { email, studentNumber, section, firstName, lastName, middleName } = payload || {};
+    const { studentEmail, studentNumber, section, firstName, lastName, middleName } = payload || {};
 
-    if (!email && !studentNumber && !section && !firstName && !lastName && !middleName) {
+    if (!studentEmail && !studentNumber && !section && !firstName && !lastName && !middleName) {
       return { success: false, message: "No data provided to update." };
     }
 
     // Normalize values
     const normalizedData = {};
-    if (email) normalizedData.studentEmail = email.trim();
+    if (studentEmail) normalizedData.studentEmail = studentEmail.trim();
     if (studentNumber) normalizedData.studentNumber = studentNumber.trim();
     if (section) normalizedData.section = section.trim();
     if (firstName) normalizedData.firstName = firstName.trim();
