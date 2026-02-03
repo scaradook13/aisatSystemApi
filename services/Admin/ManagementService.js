@@ -634,18 +634,36 @@ async addEnrolledStudentExcel(payload) {
     }
 
     // Delete all existing enrolled students
-    await EnrolledStudent.deleteMany({});
-    console.log("All enrolled students deleted before importing Excel data.");
+   await EnrolledStudent.deleteMany({});
+console.log("All enrolled students deleted before importing Excel data.");
 
-    // Insert new ones
-    const insertedStudents = await EnrolledStudent.insertMany(formattedStudents);
+const BATCH_SIZE = 100;
+let totalInserted = 0;
 
-    return {
-      success: true,
-      message: "Excel data successfully imported. All previous records replaced.",
-      count: insertedStudents.length,
-      data: insertedStudents,
-    };
+for (let i = 0; i < formattedStudents.length; i += BATCH_SIZE) {
+  const batch = formattedStudents.slice(i, i + BATCH_SIZE);
+
+  try {
+    const result = await EnrolledStudent.insertMany(batch, {
+      ordered: false // <-- VERY IMPORTANT
+    });
+
+    totalInserted += result.length;
+  } catch (err) {
+    console.error("Batch insert error:", err.message);
+
+    // still count successful inserts in this batch
+    if (err.insertedDocs) {
+      totalInserted += err.insertedDocs.length;
+    }
+  }
+}
+
+return {
+  success: true,
+  message: "Excel data successfully imported.",
+  count: totalInserted
+};
   } catch (error) {
     console.error("Error importing Excel data:", error);
     return { success: false, message: "Failed to import Excel data.", error };
